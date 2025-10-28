@@ -1,96 +1,88 @@
-# importing all the libraries
 from member import Member
 from task import Task
-from utils.file_handler import save_data,load_data
 
-
-
-
-class Task_Manager:
-    
-    # initialize the constructior with a list of members
+class TaskManager:
     def __init__(self):
-        self.MemberList = []
-
-
-    #add members
-    def add_memnber(self,member):
-        self.MemberList.append(member)
-
-    #assign task to members 
-    def assign_task(self,member_name , task):
-        pass
-
-    # showing all task
-    def show_all_task(self):
-        for member in self.MemberList:
-            print(f"{member.name}'s tasks :")
-            for task in member.tasks :
-                print(f"- {task}")
+        self.members = []
 
 
 
-    def show_pending_task(self):
-        for member in self.MemberList:
-            for task in member.tasks :
-                if task.status=='pending':
-                    #if task is pending then showing the task and the member name 
-                    print(f"- {task} - assigned to {member.name}")
+    def add_member(self, name, age):
+        member = Member(name, age)
+        self.members.append(member)
+        print(f"Member '{name}' added successfully.")
+
+
+
+    def find_member(self, name):
+        for m in self.members:
+            if m.name.lower() == name.lower():
+                return m
+        return None
+
+
+
+    def add_task(self, name, difficulty, deadline):
+        return Task(name, difficulty, deadline)
+
+
+
+    def assign_task_to_member(self, task_name, member_name, difficulty, deadline):
+        member = self.find_member(member_name)
+        if not member:
+            print(f" Member '{member_name}' not found.")
+            return
+        task = Task(task_name, difficulty, deadline)
+        member.assign_task(task)
+
+
+
+    def complete_task(self, member_name, task_name):
+        member = self.find_member(member_name)
+        if not member:
+            print(f"Member '{member_name}' not found.")
+            return
+        member.complete_task(task_name)
+
+
+
+    def show_member_tasks(self, member_name):
+        member = self.find_member(member_name)
+        if not member:
+            print(f"Member '{member_name}' not found.")
+            return
+        member.show_tasks()
+
+
+
+    def show_all_members(self):
+        if not self.members:
+            print("No members added yet.")
+            return
+        print("\nAll Members:")
+        for m in self.members:
+            print(m)
 
 
     def show_overdue_tasks(self):
-        for member in self.MemberList:
-            for task in member.Tasks:
-                #showing all the task which are delayed
-                if task.isOverDue():
-                    print(f"{task.name} -> assigned to : {member.name} ")
+        print("\nOverdue Tasks:")
+        for member in self.members:
+            for task in member.tasks:
+                if task.is_overdue():
+                    print(f"- {task.name} (Assigned to: {member.name})")
 
-    
-    def show_summury(self):
-        # total tasks 
-        # how many was done 
-        # and how many is pending
-        total , done , pending = 0  ,  0  ,  9
-        for member in self.MemberList:
-            for task in member.tasks :
-                total+=1
-                if task.status=='Completed':
-                    done+=1
+
+
+    def show_summary(self):
+        total, done, pending = 0, 0, 0
+        for member in self.members:
+            for task in member.tasks:
+                total += 1
+                if task.status == "Completed":
+                    done += 1
                 else:
-                    pending+=1
-        print(f"total     : {total}")
-        print(f"completed : {done}")
-        print(f"pending   : {pending}")
-
-
-
-    
-    def show_leaderboard(self):
-        pass
-
-
-    def serach_task(self):
-        pass
-
-
-
-    def save(self):
-        #member is a list which will store member's data as a dictionary
-        data = {"members":[]}
-
-        for member in self.MemberList:
-            #converting member data into dictionary
-            member_data = {
-                "name":member.name,
-                "age":member.age,
-                "points":member.points,
-                "tasks":[task.to_dict() for task in member.tasks] #we are storing list of tasks(dictionary)
-            }
-            data['members'].append(member_data)                   #addpening the member's data into the main data
-        save_data("data/tasks.json",data)                         #saving to the tasks.json file
-
-
-
-    def load(self):
-        data = load_data('data/tasks.json')
-        
+                    pending += 1
+        print(f"\nTask Summary:")
+        print(f"Total Tasks: {total}")
+        print(f"Completed: {done}")
+        print(f"Pending: {pending}")
