@@ -1,4 +1,3 @@
-
 from datetime import datetime
 class Task:
     def __init__(self, title, description, deadline=None):
@@ -11,14 +10,12 @@ class Task:
 
     def mark_complete(self):
         self.completed = True
-        print(f"'{self.title}' marked as completed.")
+        print(f"Task '{self.title}' marked as completed.")
 
     def __str__(self):
         status = "Done" if self.completed else "Pending"
         assigned = self.assigned_to if self.assigned_to else "Unassigned"
         return f"[{status}] {self.title} (Assigned to: {assigned})"
-
-
 
 
 
@@ -82,13 +79,13 @@ class TaskManager:
         task = None
         member = None
 
-        # Find the task by title
+        # Find the task
         for t in self.tasks:
             if t.title.lower() == task_title.lower():
                 task = t
                 break
 
-        # Find the member by name
+        # Find the member
         for m in self.members:
             if m.name.lower() == member_name.lower():
                 member = m
@@ -102,6 +99,13 @@ class TaskManager:
             return
 
         member.assign_task(task)
+
+    def complete_task(self, member_name, task_title):
+        for member in self.members:
+            if member.name.lower() == member_name.lower():
+                member.complete_task(task_title)
+                return
+        print(f"Member '{member_name}' not found.")
 
     def show_all_tasks(self):
         print("\nAll Tasks:")
@@ -125,25 +129,45 @@ class TaskManager:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ---------------------------
+# Example Usage
+# ---------------------------
 if __name__ == "__main__":
     manager = TaskManager()
 
+    # Add members
     manager.add_member("Alice")
     manager.add_member("Bob")
 
+    # Add tasks
     manager.add_task("Clean Kitchen", "Deep clean the kitchen.")
     manager.add_task("Water Plants", "Water all indoor plants.")
     manager.add_task("Take out Trash", "Take the trash out before 8 AM.")
 
+    # Assign tasks
     manager.assign_task("Clean Kitchen", "Alice")
     manager.assign_task("Take out Trash", "Bob")
 
+    # Show members and tasks
     manager.show_members()
     manager.show_all_tasks()
 
-    for member in manager.members:
-        member.show_tasks()
+    # Complete a task
+    manager.complete_task("Alice", "Clean Kitchen")
 
-    manager.members[0].complete_task("Clean Kitchen")
-
+    # Show updated list
     manager.show_all_tasks()
