@@ -1,57 +1,149 @@
-from task_manager import TaskManager
 
-def main():
-    manager = TaskManager()
+from datetime import datetime
+class Task:
+    def __init__(self, title, description, deadline=None):
+        self.title = title
+        self.description = description
+        self.deadline = deadline
+        self.completed = False
+        self.assigned_to = None
+        self.created_at = datetime.now()
 
-    while True:
-        print("\n===== 🗂️ TASK MANAGER MENU =====")
-        print("1 )  Add Member")
-        print("2 )  Assign Task")
-        print("3 )  Complete Task")
-        print("4 )  View Tasks")
-        print("5 )  View Members")
-        print("6 )  Overdue Tasks")
-        print("7 )  Summary Report")
-        print("8 )  Exit")
+    def mark_complete(self):
+        self.completed = True
+        print(f"'{self.title}' marked as completed.")
 
-        choice = input("\nEnter your choice (1-8): ")
+    def __str__(self):
+        status = "Done" if self.completed else "Pending"
+        assigned = self.assigned_to if self.assigned_to else "Unassigned"
+        return f"[{status}] {self.title} (Assigned to: {assigned})"
 
-        if choice == "1":
-            name = input("Enter member name: ")
-            age = int(input("Enter member age: "))
-            manager.add_member(name, age)
 
-        elif choice == "2":
-            member_name = input("Enter member name: ")
-            task_name = input("Enter task name: ")
-            difficulty = input("Enter difficulty (Easy/Medium/Hard): ")
-            deadline = input("Enter deadline (YYYY-MM-DD): ")
-            manager.assign_task_to_member(task_name, member_name, difficulty, deadline)
 
-        elif choice == "3":
-            member_name = input("Enter member name: ")
-            task_name = input("Enter task name: ")
-            manager.complete_task(member_name, task_name)
 
-        elif choice == "4":
-            member_name = input("Enter member name to view tasks: ")
-            manager.show_member_tasks(member_name)
 
-        elif choice == "5":
-            manager.show_all_members()
 
-        elif choice == "6":
-            manager.show_overdue_tasks()
 
-        elif choice == "7":
-            manager.show_summary()
 
-        elif choice == "8":
-            print("Exiting program. Goodbye!")
-            break
 
-        else:
-            print("Invalid choice. Please enter a number between 1 and 8.")
+
+
+
+class Member:
+    def __init__(self, name):
+        self.name = name
+        self.tasks = []
+
+    def assign_task(self, task):
+        task.assigned_to = self.name
+        self.tasks.append(task)
+        print(f"Task '{task.title}' assigned to {self.name}.")
+
+    def complete_task(self, title):
+        for task in self.tasks:
+            if task.title.lower() == title.lower():
+                task.mark_complete()
+                return
+        print(f"No task found with title '{title}' for {self.name}.")
+
+    def show_tasks(self):
+        print(f"\nTasks for {self.name}:")
+        if not self.tasks:
+            print("  (No tasks assigned)")
+        for task in self.tasks:
+            print(f"  - {task}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+class TaskManager:
+    def __init__(self):
+        self.members = []
+        self.tasks = []
+
+    def add_member(self, name):
+        self.members.append(Member(name))
+        print(f"Added member: {name}")
+
+    def add_task(self, title, description, deadline=None):
+        self.tasks.append(Task(title, description, deadline))
+        print(f"Added new task: {title}")
+
+    def assign_task(self, task_title, member_name):
+        task = None
+        member = None
+
+        # Find the task by title
+        for t in self.tasks:
+            if t.title.lower() == task_title.lower():
+                task = t
+                break
+
+        # Find the member by name
+        for m in self.members:
+            if m.name.lower() == member_name.lower():
+                member = m
+                break
+
+        if task is None:
+            print(f"Task '{task_title}' not found.")
+            return
+        if member is None:
+            print(f"Member '{member_name}' not found.")
+            return
+
+        member.assign_task(task)
+
+    def show_all_tasks(self):
+        print("\nAll Tasks:")
+        if not self.tasks:
+            print("  (No tasks yet)")
+        for task in self.tasks:
+            print(f"  - {task}")
+
+    def show_members(self):
+        print("\nMembers:")
+        if not self.members:
+            print("  (No members yet)")
+        for member in self.members:
+            print(f"  - {member.name}")
+
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
-    main()
+    manager = TaskManager()
+
+    manager.add_member("Alice")
+    manager.add_member("Bob")
+
+    manager.add_task("Clean Kitchen", "Deep clean the kitchen.")
+    manager.add_task("Water Plants", "Water all indoor plants.")
+    manager.add_task("Take out Trash", "Take the trash out before 8 AM.")
+
+    manager.assign_task("Clean Kitchen", "Alice")
+    manager.assign_task("Take out Trash", "Bob")
+
+    manager.show_members()
+    manager.show_all_tasks()
+
+    for member in manager.members:
+        member.show_tasks()
+
+    manager.members[0].complete_task("Clean Kitchen")
+
+    manager.show_all_tasks()
